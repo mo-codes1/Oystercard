@@ -30,4 +30,25 @@ describe Oystercard do
       expect { oystercard.deduct 20 }.to change { oystercard.balance }.by(-20)
     end
   end
+
+  describe '#touch in' do
+    it { is_expected.to respond_to(:touch_in) }
+    it 'expects to be mark the card as in use' do
+      expect { oystercard.touch_in }.to change { oystercard.in_use }.to eq true 
+    end
+    it 'raises error when card already in use' do
+      oystercard.touch_in
+      expect { oystercard.touch_in }.to raise_error 'card already in use'
+    end
+  end
+
+  describe '#touch out' do
+    it { is_expected.to respond_to(:touch_out) }
+    it 'expects to be mark the card as not in use' do
+      oystercard.touch_in
+      expect { oystercard.touch_out }.to change { oystercard.in_use }.to eq false 
+    end
+  end
+
+  
 end
