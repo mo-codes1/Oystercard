@@ -40,6 +40,11 @@ describe Oystercard do
       oystercard.touch_in
       expect { oystercard.touch_in }.to raise_error 'card already in use'
     end
+    it 'raises error when card is not over minimum balance' do
+        minimum_balance = Oystercard::MINIMUM_BALANCE
+        oystercard.top_up(minimum_balance - 1)
+        expect { oystercard.touch_in }.to raise_error 'balance too low'
+    end
   end
 
   describe '#touch out' do

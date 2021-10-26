@@ -1,5 +1,6 @@
 class Oystercard
   MAXIMUM_BALANCE = 90
+  MINIMUM_BALANCE = 1
   attr_reader :balance, :amount, :in_use
 
   def initialize
@@ -19,7 +20,7 @@ class Oystercard
 
   def touch_in
     fail "card already in use" if in_journey?
-
+    fail "balance too low" if min_balance?
     @in_use = true
   end
 
@@ -31,6 +32,10 @@ class Oystercard
 
   def max_balance?(amount)
     (@balance + amount) > MAXIMUM_BALANCE
+  end
+
+  def min_balance?
+    @balance < MINIMUM_BALANCE
   end
 
   def in_journey?
