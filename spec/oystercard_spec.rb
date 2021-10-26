@@ -2,7 +2,7 @@ require './lib/oystercard'
 
 describe Oystercard do
   let(:oystercard) { Oystercard.new }
-
+  let(:station) { double:station }
   describe "#balance" do
     it 'expects there to be a balance on the card' do
       expect(oystercard.balance).to eq(0)
@@ -24,40 +24,41 @@ describe Oystercard do
 
   describe '#touch in' do
     
-    it { is_expected.to respond_to(:touch_in) }
-    it 'expects to be mark the card as in use' do
-      oystercard.top_up(2)
-      expect { oystercard.touch_in }.to change { oystercard.in_use }.to eq true 
-    end
+    it { is_expected.to respond_to(:touch_in).with(1).argument }
     it 'raises error when card already in use' do
       oystercard.top_up(2)
-      oystercard.touch_in
-      expect { oystercard.touch_in }.to raise_error 'card already in use'
+      oystercard.touch_in(station)
+      expect { oystercard.touch_in(station) }.to raise_error 'card already in use'
     end
     it 'raises error when card is not over minimum balance' do
         minimum_balance = Oystercard::MINIMUM_BALANCE
         #oystercard.deduct(Oystercard::MAXIMUM_BALANCE)
         oystercard.top_up(minimum_balance - 1)
-        expect { oystercard.touch_in }.to raise_error 'balance too low'
+        expect { oystercard.touch_in(station) }.to raise_error 'balance too low'
+    end
+    it 'records the current station' do
+      oystercard.top_up(2)
+      oystercard.touch_in(station)
+      expect(oystercard.entry_station).to eq station
     end
   end
 
   describe '#touch out' do
     it { is_expected.to respond_to(:touch_out) }
-    it 'expects to be mark the card as not in use' do
-      oystercard.top_up(2)
-      oystercard.touch_in
-      expect { oystercard.touch_out }.to change { oystercard.in_use }.to eq false 
-    end
     it 'raises error when card is not in use' do
       expect { oystercard.touch_out }.to raise_error 'card is not in use'
     end
     it 'deduces balance by minimum fare' do
       oystercard.top_up(Oystercard::MAXIMUM_BALANCE)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       expect { oystercard.touch_out 2 }.to change { oystercard.balance }.by(-2)
     end
-
+    it 'removes recored station' do
+      oystercard.top_up(2)
+      oystercard.touch_in(station)
+      oystercard.touch_out
+      expect(oystercard.entry_station).to eq nil
+    end
   end
 
   
