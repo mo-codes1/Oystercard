@@ -32,16 +32,20 @@ describe Oystercard do
   end
 
   describe '#touch in' do
+    
     it { is_expected.to respond_to(:touch_in) }
     it 'expects to be mark the card as in use' do
+      oystercard.top_up(2)
       expect { oystercard.touch_in }.to change { oystercard.in_use }.to eq true 
     end
     it 'raises error when card already in use' do
+      oystercard.top_up(2)
       oystercard.touch_in
       expect { oystercard.touch_in }.to raise_error 'card already in use'
     end
     it 'raises error when card is not over minimum balance' do
         minimum_balance = Oystercard::MINIMUM_BALANCE
+        #oystercard.deduct(Oystercard::MAXIMUM_BALANCE)
         oystercard.top_up(minimum_balance - 1)
         expect { oystercard.touch_in }.to raise_error 'balance too low'
     end
@@ -50,8 +54,12 @@ describe Oystercard do
   describe '#touch out' do
     it { is_expected.to respond_to(:touch_out) }
     it 'expects to be mark the card as not in use' do
+      oystercard.top_up(2)
       oystercard.touch_in
       expect { oystercard.touch_out }.to change { oystercard.in_use }.to eq false 
+    end
+    it 'raies error when card is not in use' do
+      expect { oystercard.touch_out }.to raise_error 'card is not in use'
     end
   end
 

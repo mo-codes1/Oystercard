@@ -25,6 +25,7 @@ class Oystercard
   end
 
   def touch_out
+    fail "card is not in use" unless in_journey?
     @in_use = false
   end
 
