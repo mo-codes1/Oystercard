@@ -14,22 +14,23 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
-
   def touch_in
     fail "card already in use" if in_journey?
     fail "balance too low" if min_balance?
     @in_use = true
   end
 
-  def touch_out
+  def touch_out(fare = 1)
     fail "card is not in use" unless in_journey?
+    deduct(fare)
     @in_use = false
   end
 
   private
+
+  def deduct(amount)
+    @balance -= amount
+  end
 
   def max_balance?(amount)
     (@balance + amount) > MAXIMUM_BALANCE
