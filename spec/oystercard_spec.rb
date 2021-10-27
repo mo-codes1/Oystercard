@@ -32,7 +32,6 @@ describe Oystercard do
     end
     it 'raises error when card is not over minimum balance' do
         minimum_balance = Oystercard::MINIMUM_BALANCE
-        #oystercard.deduct(Oystercard::MAXIMUM_BALANCE)
         oystercard.top_up(minimum_balance - 1)
         expect { oystercard.touch_in(station) }.to raise_error 'balance too low'
     end
@@ -44,22 +43,40 @@ describe Oystercard do
   end
 
   describe '#touch out' do
-    it { is_expected.to respond_to(:touch_out) }
+    it { is_expected.to respond_to(:touch_out).with(1).argument }
     it 'raises error when card is not in use' do
-      expect { oystercard.touch_out }.to raise_error 'card is not in use'
+      expect { oystercard.touch_out(station) }.to raise_error 'card is not in use'
     end
     it 'deduces balance by minimum fare' do
       oystercard.top_up(Oystercard::MAXIMUM_BALANCE)
       oystercard.touch_in(station)
-      expect { oystercard.touch_out 2 }.to change { oystercard.balance }.by(-2)
+      expect { oystercard.touch_out(station)  }.to change { oystercard.balance }.by(-Oystercard::MINIMUM_FARE)
     end
     it 'removes recored station' do
       oystercard.top_up(2)
       oystercard.touch_in(station)
-      oystercard.touch_out
+      oystercard.touch_out(station)
       expect(oystercard.entry_station).to eq nil
     end
+    it 'records the exit station' do
+      oystercard.top_up(2)
+      oystercard.touch_in(station)
+      oystercard.touch_out(station)
+      expect(oystercard.exit_station).to eq nil
+    end
   end
+
+    it 'expects an empty list of journeys by default' do
+      expect(oystercard.journey_list).to be_empty
+    end
+
+    it 'adds journeys to list of journeys' do
+      oystercard.top_up(2)
+      oystercard.touch_in(station)
+      expect { oystercard.touch_out(station) }.to change{oystercard.journey_list.length}.by 1
+    end
+
+
 
   
 end
