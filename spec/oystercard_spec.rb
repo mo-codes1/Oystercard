@@ -23,7 +23,6 @@ describe Oystercard do
   end
 
   describe '#touch in' do
-    
     it { is_expected.to respond_to(:touch_in).with(1).argument }
     it 'raises error when card already in use' do
       oystercard.top_up(2)
@@ -52,7 +51,7 @@ describe Oystercard do
       oystercard.touch_in(station)
       expect { oystercard.touch_out(station)  }.to change { oystercard.balance }.by(-Oystercard::MINIMUM_FARE)
     end
-    it 'removes recored station' do
+    it 'removes recorded station' do
       oystercard.top_up(2)
       oystercard.touch_in(station)
       oystercard.touch_out(station)
@@ -65,7 +64,6 @@ describe Oystercard do
       expect(oystercard.exit_station).to eq nil
     end
   end
-
     it 'expects an empty list of journeys by default' do
       expect(oystercard.journey_list).to be_empty
     end
